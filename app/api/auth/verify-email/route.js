@@ -11,8 +11,13 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const token = searchParams.get('token');
 
+    // Dominio base del frontend (debe estar definido en las variables de entorno de Vercel)
+    const frontendUrl = process.env.FRONTEND_URL || 'https://front-prueba-dna.vercel.app';
+
     if (!token) {
-      return NextResponse.redirect(new URL('/verify?error=no-token', request.url));
+      return NextResponse.redirect(
+        new URL('/verify?error=no-token', frontendUrl)
+      );
     }
 
     let decoded;
@@ -20,17 +25,23 @@ export async function GET(request) {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (err) {
       console.error('Error verificando token:', err.message);
-      return NextResponse.redirect(new URL('/verify?error=invalid-token', request.url));
+      return NextResponse.redirect(
+        new URL('/verify?error=invalid-token', frontendUrl)
+      );
     }
 
     const user = await User.findOne({ email: decoded.email });
 
     if (!user) {
-      return NextResponse.redirect(new URL('/verify?error=user-not-found', request.url));
+      return NextResponse.redirect(
+        new URL('/verify?error=user-not-found', frontendUrl)
+      );
     }
 
     if (user.isVerified) {
-      return NextResponse.redirect(new URL('/verify?already=verified', request.url));
+      return NextResponse.redirect(
+        new URL('/verify?already=verified', frontendUrl)
+      );
     }
 
     // Marcar como verificado
@@ -39,11 +50,16 @@ export async function GET(request) {
     user.verificationTokenExpires = undefined;
     await user.save();
 
-    // Redirigir a página de éxito bonita
-    return NextResponse.redirect(new URL('/verify-success', request.url));
+    // Redirigir a página de éxito bonita en el frontend
+    return NextResponse.redirect(
+      new URL('/verify-success', frontendUrl)
+    );
 
   } catch (error) {
     console.error('Error verificando email:', error);
-    return NextResponse.redirect(new URL('/verify?error=server-error', request.url));
+    const frontendUrl = process.env.FRONTEND_URL || 'https://front-prueba-dna.vercel.app';
+    return NextResponse.redirect(
+      new URL('/verify?error=server-error', frontendUrl)
+    );
   }
 }
