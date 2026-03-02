@@ -1,5 +1,4 @@
 // app/api/auth/verify-email/route.js
-
 import { NextResponse } from 'next/server';
 import { connectToDB } from '@/lib/db';
 import User from '@/models/User';
@@ -13,40 +12,38 @@ export async function GET(request) {
     const token = searchParams.get('token');
 
     if (!token) {
-      return NextResponse.json({ error: 'Token requerido' }, { status: 400 });
+      return NextResponse.redirect(new URL('/verify?error=no-token', request.url));
     }
 
-    // Verificar token
     let decoded;
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (err) {
       console.error('Error verificando token:', err.message);
-      return NextResponse.json({ error: 'Token inválido o expirado' }, { status: 400 });
+      return NextResponse.redirect(new URL('/verify?error=invalid-token', request.url));
     }
 
     const user = await User.findOne({ email: decoded.email });
 
     if (!user) {
-      return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
+      return NextResponse.redirect(new URL('/verify?error=user-not-found', request.url));
     }
 
     if (user.isVerified) {
-      return NextResponse.json({ message: 'Correo ya verificado anteriormente' });
+      return NextResponse.redirect(new URL('/verify?already=verified', request.url));
     }
 
-    // Marcar como verificado y limpiar token
+    // Marcar como verificado
     user.isVerified = true;
     user.verificationToken = undefined;
     user.verificationTokenExpires = undefined;
     await user.save();
 
-    return NextResponse.json({ 
-      message: 'Correo verificado exitosamente. Ahora puedes iniciar sesión.' 
-    });
+    // Redirigir a página de éxito bonita
+    return NextResponse.redirect(new URL('/verify-success', request.url));
 
   } catch (error) {
     console.error('Error verificando email:', error);
-    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
+    return NextResponse.redirect(new URL('/verify?error=server-error', request.url));
   }
 }
