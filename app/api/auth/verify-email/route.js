@@ -11,7 +11,7 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const token = searchParams.get('token');
 
-    const frontendUrl = process.env.FRONTEND_URL;
+    const frontendUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
     if (!frontendUrl) {
       console.error('FRONTEND_URL no está definido en env vars');
