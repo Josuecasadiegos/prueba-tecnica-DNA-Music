@@ -19,7 +19,7 @@ export async function GET(request) {
     }
 
     if (!token) {
-      return NextResponse.redirect(`${frontendUrl}/verify?error=no-token`);
+      return NextResponse.redirect(`${frontendUrl}verify?error=no-token`);
     }
 
     let decoded;
@@ -27,17 +27,17 @@ export async function GET(request) {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (err) {
       console.error('Error verificando token:', err.message);
-      return NextResponse.redirect(`${frontendUrl}/verify?error=invalid-token`);
+      return NextResponse.redirect(`${frontendUrl}verify?error=invalid-token`);
     }
 
     const user = await User.findOne({ email: decoded.email });
 
     if (!user) {
-      return NextResponse.redirect(`${frontendUrl}/verify?error=user-not-found`);
+      return NextResponse.redirect(`${frontendUrl}verify?error=user-not-found`);
     }
 
     if (user.isVerified) {
-      return NextResponse.redirect(`${frontendUrl}/verify?already=verified`);
+      return NextResponse.redirect(`${frontendUrl}verify?already=verified`);
     }
 
     user.isVerified = true;
@@ -45,11 +45,11 @@ export async function GET(request) {
     user.verificationTokenExpires = undefined;
     await user.save();
 
-    return NextResponse.redirect(`${frontendUrl}/verify-success`);
+    return NextResponse.redirect(`${frontendUrl}verify-success`);
 
   } catch (error) {
     console.error('Error verificando email:', error);
     const frontendUrl = process.env.FRONTEND_URL;
-    return NextResponse.redirect(`${frontendUrl}/verify?error=server-error`);
+    return NextResponse.redirect(`${frontendUrl}verify?error=server-error`);
   }
 }
