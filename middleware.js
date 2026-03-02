@@ -2,8 +2,8 @@
 import { NextResponse } from 'next/server';
 
 const ALLOWED_ORIGINS = [
-  'https://tu-frontend.vercel.app',           // producción
-  'http://localhost:3000',                     // desarrollo
+  'https://front-prueba-dna.vercel.app',   // ← agrega esto
+  'http://localhost:3000',                 // desarrollo
   // agrega previews si usas vercel.preview → pero mejor usar dominio fijo
 ];
 
