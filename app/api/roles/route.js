@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { connectToDB } from '@/lib/db';        // ajusta la ruta según tu estructura
+import { connectToDB } from '@/lib/db';
 import Role from '@/models/Role';
 
 export async function GET() {

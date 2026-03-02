@@ -1,5 +1,3 @@
-// app/api/auth/login/route.js
-
 import { NextResponse } from 'next/server';
 import { connectToDB } from '@/lib/db';
 import User from '@/models/User';
@@ -47,7 +45,6 @@ export async function POST(request) {
       return response;
     }
 
-    // LOGIN EXITOSO
     const token = signToken({
       userId: user._id.toString(),
       username: user.username,
@@ -61,7 +58,7 @@ export async function POST(request) {
 
     response.cookies.set('auth_token', token, {
       ...cookieOptions,
-      maxAge: 60 * 60, // 1 hora
+      maxAge: 60 * 60,
     });
 
     return response;

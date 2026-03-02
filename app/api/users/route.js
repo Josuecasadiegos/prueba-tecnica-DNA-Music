@@ -4,14 +4,13 @@ import Role from '../../../models/Role';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
-const { requireAuth } = require('@/lib/auth');
+import { requireAuth } from '@/lib/auth';
 
-// GET: Listar usuarios
 export async function GET(request) {
-    const authResult = await requireAuth(request, ['admin']);  // solo admin
+    const authResult = await requireAuth(request, ['admin']);
 
     if (authResult.response) {
-        return authResult.response;  // devuelve 401 o 403 automáticamente
+        return authResult.response;
     }
 
     await connectToDB();
@@ -19,7 +18,6 @@ export async function GET(request) {
     return NextResponse.json(users);
 }
 
-// POST: Crear usuario
 export async function POST(request) {
   await connectToDB();
   const { username, password, roleName } = await request.json();

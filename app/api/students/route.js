@@ -73,9 +73,6 @@ export async function DELETE(request) {
       return NextResponse.json({ error: 'Estudiante no encontrado' }, { status: 404 });
     }
 
-    // Opcional: eliminar también sus notas en cascada
-    // await Grade.deleteMany({ student: id });
-
     return NextResponse.json({ message: 'Estudiante eliminado' });
   } catch (error) {
     console.error('Error DELETE student:', error);

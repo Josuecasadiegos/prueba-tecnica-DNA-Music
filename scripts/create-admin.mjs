@@ -1,5 +1,3 @@
-// scripts/create-admin.mjs
-
 import 'dotenv/config';
 import { connectToDB } from '../lib/db.js';               // ← relativo desde scripts/
 import User from '../models/User.js';                     // ← relativo
@@ -25,7 +23,7 @@ async function setupAdmin() {
       process.exit(0);
     }
 
-    const password = 'Admin123!2025';   // ← ¡cambia esto!
+    const password = 'Admin123!2025';
     const hashed = await bcrypt.hash(password, 10);
 
     const admin = new User({

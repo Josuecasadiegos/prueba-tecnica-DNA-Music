@@ -1,10 +1,8 @@
-// middleware.js
 import { NextResponse } from 'next/server';
 
 const ALLOWED_ORIGINS = [
-  'https://front-prueba-dna.vercel.app',   // ← agrega esto
-  'http://localhost:3000',                 // desarrollo
-  // agrega previews si usas vercel.preview → pero mejor usar dominio fijo
+  'https://front-prueba-dna.vercel.app',
+  'http://localhost:3000',
 ];
 
 export function middleware(request) {
@@ -17,7 +15,6 @@ export function middleware(request) {
     response.headers.set('Access-Control-Allow-Origin', origin);
     response.headers.set('Access-Control-Allow-Credentials', 'true');
   } else {
-    // Opcional: no setear nada o setear solo para OPTIONS
   }
 
   response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');

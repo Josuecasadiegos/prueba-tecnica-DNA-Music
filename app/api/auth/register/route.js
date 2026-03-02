@@ -1,5 +1,3 @@
-// app/api/auth/register/route.js
-
 import { NextResponse } from 'next/server';
 import { connectToDB } from '@/lib/db';
 import User from '@/models/User';
@@ -29,7 +27,6 @@ export async function POST(request) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Generar token de verificación (expira en 1 hora)
     const verificationToken = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     const newUser = new User({
@@ -38,12 +35,11 @@ export async function POST(request) {
       password: hashedPassword,
       role: role._id,
       verificationToken,
-      verificationTokenExpires: Date.now() + 3600000, // 1 hora
+      verificationTokenExpires: Date.now() + 3600000, 
     });
 
     await newUser.save();
 
-    // Enviar email de verificación
     await sendVerificationEmail(email, verificationToken);
 
     return NextResponse.json({

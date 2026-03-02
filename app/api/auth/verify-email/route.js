@@ -1,4 +1,3 @@
-// app/api/auth/verify-email/route.js
 import { NextResponse } from 'next/server';
 import { connectToDB } from '@/lib/db';
 import User from '@/models/User';
@@ -33,7 +32,7 @@ export async function GET(request) {
     const user = await User.findOne({ email: decoded.email });
 
     if (!user) {
-      return NextResponse.redirect(`${frontendUrl}verify?error=user-not-found`);
+      return NextResponse.redirect(`${frontendUrl}verify?error=user-not-found`); 
     }
 
     if (user.isVerified) {

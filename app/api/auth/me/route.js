@@ -1,5 +1,3 @@
-// app/api/auth/me/route.js (en el backend)
-
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 
@@ -11,7 +9,6 @@ export async function GET(request) {
       return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
     }
 
-    // Devuelve el usuario (sin password ni datos sensibles)
     return NextResponse.json({ 
       user: {
         username: user.username,

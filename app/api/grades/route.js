@@ -5,7 +5,6 @@ import Grade from '@/models/Grade';
 export async function GET() {
   try {
     await connectToDB();
-    // Poblar estudiante y materia para mostrar nombres en lugar de solo IDs
     const grades = await Grade.find()
       .populate('student', 'name')
       .populate('subject', 'name')
@@ -31,7 +30,6 @@ export async function POST(request) {
     const newGrade = new Grade(data);
     await newGrade.save();
 
-    // Retornar con populate para mejor UX
     const populated = await Grade.findById(newGrade._id)
       .populate('student', 'name')
       .populate('subject', 'name');
