@@ -13,8 +13,14 @@ export async function POST(request) {
     const body = await request.json();
     const { username, password } = body;
 
+    // Caso 1: Faltan credenciales → borramos cookie y devolvemos error
     if (!username || !password) {
-      return NextResponse.json({ error: 'Credenciales requeridas' }, { status: 400 });
+      const response = NextResponse.json(
+        { error: 'Credenciales requeridas' },
+        { status: 400 }
+      );
+      response.cookies.delete('auth_token');
+      return response;
     }
 
     // Debug (puedes quitar después)
@@ -22,19 +28,40 @@ export async function POST(request) {
     console.log('findOne es función?', typeof User?.findOne === 'function');
 
     const user = await User.findOne({ username }).populate('role', 'name');
+
+    // Caso 2: Usuario no encontrado → borramos cookie
     if (!user) {
-      return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 401 });
+      const response = NextResponse.json(
+        { error: 'Usuario no encontrado' },
+        { status: 401 }
+      );
+      response.cookies.delete('auth_token');
+      return response;
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
+
+    // Caso 3: Contraseña incorrecta → borramos cookie
     if (!isMatch) {
-      return NextResponse.json({ error: 'Contraseña incorrecta' }, { status: 401 });
+      const response = NextResponse.json(
+        { error: 'Contraseña incorrecta' },
+        { status: 401 }
+      );
+      response.cookies.delete('auth_token');
+      return response;
     }
 
+    // Caso 4: Usuario no verificado → borramos cookie
     if (!user.isVerified) {
-      return NextResponse.json({ error: 'Por favor confirma tu correo primero' }, { status: 403 });
+      const response = NextResponse.json(
+        { error: 'Por favor confirma tu correo primero' },
+        { status: 403 }
+      );
+      response.cookies.delete('auth_token');
+      return response;
     }
 
+    // Solo si todo está correcto → generamos token y seteamos cookie
     const token = signToken({
       userId: user._id.toString(),
       username: user.username,
@@ -48,15 +75,22 @@ export async function POST(request) {
 
     response.cookies.set('auth_token', token, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      maxAge: 60 * 60,
+      secure: true,           // correcto para producción (HTTPS)
+      sameSite: 'none',       // necesario para cross-origin (frontend y backend separados)
+      maxAge: 60 * 60,        // 1 hora
       path: '/',
     });
 
     return response;
   } catch (error) {
     console.error('Error en login:', error);
-    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
+
+    // Caso 5: Error interno → también borramos la cookie por seguridad
+    const response = NextResponse.json(
+      { error: 'Error interno del servidor' },
+      { status: 500 }
+    );
+    response.cookies.delete('auth_token');
+    return response;
   }
 }
