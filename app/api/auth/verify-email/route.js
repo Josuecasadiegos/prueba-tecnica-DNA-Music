@@ -11,13 +11,11 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const token = searchParams.get('token');
 
-    // Dominio base del frontend (debe estar definido en las variables de entorno de Vercel)
-    const frontendUrl = process.env.FRONTEND_URL || 'https://front-prueba-dna.vercel.app';
+    // Usa variable de entorno para el frontend (agrega en Vercel del backend)
+    const frontendBase = process.env.FRONTEND_URL || 'https://prueba-tecnica-dna-music-josuecasadiegos-projects.vercel.app';
 
     if (!token) {
-      return NextResponse.redirect(
-        new URL('/verify?error=no-token', frontendUrl)
-      );
+      return NextResponse.redirect(`${frontendBase}/verify?error=no-token`, 302); // o deja 307
     }
 
     let decoded;
@@ -25,23 +23,17 @@ export async function GET(request) {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (err) {
       console.error('Error verificando token:', err.message);
-      return NextResponse.redirect(
-        new URL('/verify?error=invalid-token', frontendUrl)
-      );
+      return NextResponse.redirect(`${frontendBase}/verify?error=invalid-token`, 302);
     }
 
     const user = await User.findOne({ email: decoded.email });
 
     if (!user) {
-      return NextResponse.redirect(
-        new URL('/verify?error=user-not-found', frontendUrl)
-      );
+      return NextResponse.redirect(`${frontendBase}/verify?error=user-not-found`, 302);
     }
 
     if (user.isVerified) {
-      return NextResponse.redirect(
-        new URL('/verify?already=verified', frontendUrl)
-      );
+      return NextResponse.redirect(`${frontendBase}/verify?already=verified`, 302);
     }
 
     // Marcar como verificado
@@ -50,16 +42,11 @@ export async function GET(request) {
     user.verificationTokenExpires = undefined;
     await user.save();
 
-    // Redirigir a página de éxito bonita en el frontend
-    return NextResponse.redirect(
-      new URL('/verify-success', frontendUrl)
-    );
+    return NextResponse.redirect(`${frontendBase}/verify-success`, 302);
 
   } catch (error) {
     console.error('Error verificando email:', error);
-    const frontendUrl = process.env.FRONTEND_URL || 'https://front-prueba-dna.vercel.app';
-    return NextResponse.redirect(
-      new URL('/verify?error=server-error', frontendUrl)
-    );
+    const frontendBase = process.env.FRONTEND_URL || 'https://prueba-tecnica-dna-music-josuecasadiegos-projects.vercel.app';
+    return NextResponse.redirect(`${frontendBase}/verify?error=server-error`, 302);
   }
 }
