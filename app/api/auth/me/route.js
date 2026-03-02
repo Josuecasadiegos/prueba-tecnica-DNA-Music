@@ -1,14 +1,25 @@
-// app/api/auth/me/route.js
+// app/api/auth/me/route.js (en el backend)
 
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 
 export async function GET(request) {
-  const user = await getCurrentUser(request);
+  try {
+    const user = await getCurrentUser(request);
 
-  if (!user) {
-    return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
+    if (!user) {
+      return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
+    }
+
+    // Devuelve el usuario (sin password ni datos sensibles)
+    return NextResponse.json({ 
+      user: {
+        username: user.username,
+        role: user.role,
+      }
+    });
+  } catch (error) {
+    console.error('Error en /me:', error);
+    return NextResponse.json({ error: 'Error interno' }, { status: 500 });
   }
-
-  return NextResponse.json({ user });
 }
