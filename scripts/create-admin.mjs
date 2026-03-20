@@ -9,15 +9,15 @@ async function setupAdmin() {
     await connectToDB();
     console.log('Conexión establecida');
 
-    let adminRole = await Role.findOne({ name: 'admin' });
+    let adminRole = await Role.findOne({ name: 'Administrador' });
     if (!adminRole) {
-      console.log('Creando rol "admin"...');
-      adminRole = new Role({ name: 'admin' });
+      console.log('Creando rol "Administrador"...');
+      adminRole = new Role({ name: 'Administrador' });
       await adminRole.save();
       console.log('Rol creado →', adminRole._id);
     }
 
-    const existing = await User.findOne({ username: 'admin' });
+    const existing = await User.findOne({ username: 'Administrador' });
     if (existing) {
       console.log('Admin ya existe');
       process.exit(0);
@@ -27,7 +27,7 @@ async function setupAdmin() {
     const hashed = await bcrypt.hash(password, 10);
 
     const admin = new User({
-      username: 'admin',
+      username: 'Administrador',
       email: 'admin@example.com',
       password: hashed,
       role: adminRole._id,
@@ -36,8 +36,8 @@ async function setupAdmin() {
 
     await admin.save();
 
-    console.log('\nAdmin creado OK');
-    console.log('user: admin');
+    console.log('\Administrador creado OK');
+    console.log('user: Administrador');
     console.log('pass: ' + password);
     console.log('email: admin@example.com');
 
