@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { connectToDB } from '@/lib/db';
 import User from '@/models/User';
 import jwt from 'jsonwebtoken';
-import { getIO } from '@/lib/socket';
 
 export async function GET(request) {
   try {
@@ -44,15 +43,11 @@ export async function GET(request) {
     user.verificationToken = undefined;
     user.verificationTokenExpires = undefined;
     await user.save();
-    try {
-      const io = getIO();
 
-      io.emit('user_verified', {
-        message: `Usuario ${user.email} verificado`,
-      });
-    } catch (err) {
-      console.log('Socket no inicializado');
-    }
+    await Notification.create({
+      type: 'user_verified',
+      message: `Usuario ${user.email} fue verificado`,
+    });
 
     return NextResponse.redirect(`${frontendUrl}verify-success`);
 
