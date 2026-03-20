@@ -11,6 +11,8 @@ export async function POST(request) {
     const body = await request.json();
     const { username, password } = body;
 
+    const email = username;
+
     const cookieOptions = {
       path: '/',
       httpOnly: true,
@@ -18,13 +20,13 @@ export async function POST(request) {
       sameSite: 'none',
     };
 
-    if (!username || !password) {
+    if (!email || !password) {
       const response = NextResponse.json({ error: 'Credenciales requeridas' }, { status: 400 });
       response.cookies.delete('auth_token', cookieOptions);
       return response;
     }
 
-    const user = await User.findOne({ username }).populate('role', 'name');
+    const user = await User.findOne({ email }).populate('role', 'name');
 
     if (!user) {
       const response = NextResponse.json({ error: 'Usuario no encontrado' }, { status: 401 });
